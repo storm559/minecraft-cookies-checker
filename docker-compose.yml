@@ -1,0 +1,23 @@
+services:
+  checker-cli:
+    build: .
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - MC_CHECKER_DB_PATH=/app/data/audit.db
+      - MC_CHECKER_CONCURRENCY=5
+      - MC_CHECKER_RATE_LIMIT=1
+    command: ["--help"]
+
+  checker-web:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - MC_CHECKER_DB_PATH=/app/data/audit.db
+      - MC_CHECKER_CONCURRENCY=5
+      - MC_CHECKER_RATE_LIMIT=1
+    command: ["serve", "--port", "8080"]
