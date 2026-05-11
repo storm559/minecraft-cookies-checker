@@ -1,0 +1,7 @@
+2024-06-15 10:00:01 INFO Request from 192.168.1.10
+2024-06-15 10:00:02 DEBUG Cookie: MC_SESSION=abc123def456; MUID=aabbccdd11223344; path=/
+2024-06-15 10:00:03 INFO Response 200 OK
+2024-06-15 10:00:04 WARN Slow query: 2.3s
+2024-06-15 10:00:05 DEBUG Set-Cookie: sid=session_token_value_123; Domain=.minecraft.net; Path=/; HttpOnly
+2024-06-15 10:00:06 INFO User-Agent: Mozilla/5.0
+2024-06-15 10:00:07 DEBUG params: user_id=12345 action=profile_view

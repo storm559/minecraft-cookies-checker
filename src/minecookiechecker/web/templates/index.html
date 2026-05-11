@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MineCookieChecker</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, sans-serif; background: #1a1a2e; color: #e0e0e0; padding: 2rem; }
+        h1 { color: #00d4aa; margin-bottom: 1rem; }
+        .banner { background: #16213e; border: 1px solid #e94560; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.85rem; line-height: 1.5; }
+        .banner h3 { color: #e94560; margin-bottom: 0.5rem; }
+        form { background: #16213e; padding: 1.5rem; border-radius: 8px; max-width: 600px; }
+        label { display: block; margin-top: 1rem; font-weight: bold; color: #00d4aa; }
+        input, select, textarea { width: 100%; padding: 0.5rem; margin-top: 0.3rem; border: 1px solid #333; border-radius: 4px; background: #0f3460; color: #e0e0e0; }
+        button { margin-top: 1.5rem; padding: 0.7rem 2rem; background: #e94560; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
+        button:hover { background: #c73650; }
+        .consent-check { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; }
+        .consent-check input { width: auto; }
+        #results { margin-top: 2rem; }
+        pre { background: #0f3460; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <h1>MineCookieChecker</h1>
+
+    <div class="banner">
+        <h3>Legal Notice &amp; Required Consent</h3>
+        <p>This tool validates HTTP cookies against minecraft.net for <strong>authorised security auditing only</strong>.</p>
+        <p>By using this tool you confirm you <strong>own the accounts</strong> associated with these cookies or have <strong>explicit written consent</strong> from the account owners.</p>
+        <p><strong>Prohibited:</strong> credential stuffing, unauthorised access, harvesting third-party cookies, any violation of Minecraft/Mojang ToS or applicable law.</p>
+        <p>All runs are audited and logged locally.</p>
+    </div>
+
+    <form id="checkForm">
+        <div class="consent-check">
+            <input type="checkbox" id="consentBox" required>
+            <label for="consentBox" style="display:inline; margin-top:0;">
+                I confirm I have authorisation to test these cookies
+            </label>
+        </div>
+
+        <label for="mode">Mode</label>
+        <select id="mode" name="mode">
+            <option value="header">Cookie Header String</option>
+            <option value="file">Cookies.txt File Path</option>
+            <option value="logs">Logs Directory</option>
+        </select>
+
+        <label for="cookieInput">Cookie Header / Input</label>
+        <textarea id="cookieInput" name="cookie_input" rows="3" placeholder="session_id=abc123; token=xyz789"></textarea>
+
+        <label for="filePath">File Path (for file/logs mode)</label>
+        <input type="text" id="filePath" name="file_path" placeholder="/path/to/cookies.txt or /path/to/logs">
+
+        <div class="consent-check">
+            <input type="checkbox" id="dryRun" name="dry_run">
+            <label for="dryRun" style="display:inline; margin-top:0;">Dry Run (no network requests)</label>
+        </div>
+
+        <button type="submit">Check Cookies</button>
+    </form>
+
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('checkForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const consent = document.getElementById('consentBox').checked ? 'yes' : 'no';
+            const mode = document.getElementById('mode').value;
+            const cookieInput = document.getElementById('cookieInput').value;
+            const filePath = document.getElementById('filePath').value;
+            const dryRun = document.getElementById('dryRun').checked;
+
+            const formData = new FormData();
+            formData.append('consent', consent);
+            formData.append('mode', mode);
+            formData.append('cookie_input', cookieInput);
+            if (mode === 'file') formData.append('file_path', filePath);
+            if (mode === 'logs') formData.append('logs_path', filePath);
+            formData.append('dry_run', dryRun);
+
+            try {
+                const resp = await fetch('/check', { method: 'POST', body: formData });
+                const data = await resp.json();
+                document.getElementById('results').innerHTML =
+                    '<h2>Results</h2><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (err) {
+                document.getElementById('results').innerHTML =
+                    '<h2>Error</h2><pre>' + err.message + '</pre>';
+            }
+        });
+    </script>
+</body>
+</html>
